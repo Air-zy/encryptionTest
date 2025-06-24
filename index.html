@@ -60,16 +60,16 @@
   <div class="panel" id="base64-panel">
     <h2>UTF-8 ↔ Base64 (Manual)</h2>
     <label for="input">Input String:</label>
-    <textarea id="input" placeholder="Type text here..."></textarea>
+    <textarea id="input" placeholder="type text here..."></textarea>
 
     <button onclick="runEncode()">Encode →</button>
     <button onclick="runDecode()">← Decode</button>
 
     <label for="encoded">Encoded (Base64):</label>
-    <textarea id="encoded" placeholder="Base64 output..."></textarea>
+    <textarea id="encoded" placeholder="base64 output..."></textarea>
 
     <label for="decoded">Decoded String:</label>
-    <textarea id="decoded" readonly placeholder="Decoded text appears here"></textarea>
+    <textarea id="decoded" readonly placeholder="decoded text appears here"></textarea>
 
     <div id="timing"></div>
   </div>
@@ -80,16 +80,16 @@
     <input type="text" id="aes-key" placeholder="e.g. 00112233445566778899aabbccddeeff">
 
     <label for="aes-plaintext">Plaintext to Encrypt:</label>
-    <textarea id="aes-plaintext" placeholder="Type plaintext here..."></textarea>
+    <textarea id="aes-plaintext" placeholder="type plaintext here..."></textarea>
     <button onclick="runAesEncrypt()">AES Encrypt →</button>
     <label for="aes-ciphertext">Ciphertext (Base64):</label>
-    <textarea id="aes-ciphertext" placeholder="Ciphertext Base64 appears here"></textarea>
+    <textarea id="aes-ciphertext" placeholder="ciphertext base64 appears here"></textarea>
 
     <label for="aes-ciphertext-in">Ciphertext (Base64) to Decrypt:</label>
-    <textarea id="aes-ciphertext-in" placeholder="Paste Base64 ciphertext here..."></textarea>
+    <textarea id="aes-ciphertext-in" placeholder="paste base64 ciphertext here..."></textarea>
     <button onclick="runAesDecrypt()">← AES Decrypt</button>
     <label for="aes-decrypted">Decrypted Plaintext:</label>
-    <textarea id="aes-decrypted" readonly placeholder="Decrypted plaintext appears here"></textarea>
+    <textarea id="aes-decrypted" readonly placeholder="decrypted plaintext appears here"></textarea>
 
     <div id="aes-timing"></div>
   </div>

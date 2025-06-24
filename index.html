@@ -75,20 +75,20 @@
   </div>
 
   <div class="panel" id="aes-panel">
-    <h2>AES-128-ECB Encrypt/Decrypt</h2>
+    <h2>AES-128-ECB encrypt/decrypt</h2>
     <label for="aes-key">Key (hex, 32 hex characters = 16 bytes):</label>
     <input type="text" id="aes-key" placeholder="e.g. 00112233445566778899aabbccddeeff">
 
     <label for="aes-plaintext">Plaintext to Encrypt:</label>
     <textarea id="aes-plaintext" placeholder="type plaintext here..."></textarea>
     <button onclick="runAesEncrypt()">AES Encrypt →</button>
-    <label for="aes-ciphertext">Ciphertext (Base64):</label>
+    <label for="aes-ciphertext">ciphertext (Base64):</label>
     <textarea id="aes-ciphertext" placeholder="ciphertext base64 appears here"></textarea>
 
-    <label for="aes-ciphertext-in">Ciphertext (Base64) to Decrypt:</label>
+    <label for="aes-ciphertext-in">ciphertext (Base64) to Decrypt:</label>
     <textarea id="aes-ciphertext-in" placeholder="paste base64 ciphertext here..."></textarea>
     <button onclick="runAesDecrypt()">← AES Decrypt</button>
-    <label for="aes-decrypted">Decrypted Plaintext:</label>
+    <label for="aes-decrypted">decrypted Plaintext:</label>
     <textarea id="aes-decrypted" readonly placeholder="decrypted plaintext appears here"></textarea>
 
     <div id="aes-timing"></div>

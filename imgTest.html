@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Canvas AES‑ECB vs AES‑CBC Encrypt</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    .wrapper { display: flex; gap: 40px; }
+    .panel { flex: 1; }
+    canvas { border: 1px solid #ccc; display: block; margin: 10px 0; }
+    .controls { margin: 10px 0; }
+    button { margin-right: 10px; }
+    label { display: block; margin-top: 10px; }
+    h2 { margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>AES‑CBC vs AES‑ECB: Canvas Encryption Comparison</h1>
+
+  <!-- Key Input (shared) -->
+  <label>
+    AES-128 Key (32 hex chars):
+    <input type="text" id="keyInput" placeholder="0123456789abcdef..." maxlength="34" style="width: 350px;" />
+  </label>
+
+  <!-- Load Image once -->
+  <label>
+    Load Image:
+    <input type="file" id="fileInput" accept="image/*">
+  </label>
+
+  <div class="wrapper">
+    <!-- CBC Panel -->
+    <div class="panel" id="cbcPanel">
+      <h2>AES‑CBC</h2>
+      <canvas id="cbcInputCanvas"></canvas>
+      <div class="controls">
+        <button id="cbcEncryptBtn" disabled>Encrypt (CBC)</button>
+      </div>
+      <h3>Encrypted Output (CBC)</h3>
+      <canvas id="cbcOutputCanvas"></canvas>
+    </div>
+
+    <!-- ECB Panel -->
+    <div class="panel" id="ecbPanel">
+      <h2>AES‑ECB</h2>
+      <canvas id="ecbInputCanvas"></canvas>
+      <div class="controls">
+        <button id="ecbEncryptBtn" disabled>Encrypt (ECB)</button>
+      </div>
+      <h3>Encrypted Output (ECB)</h3>
+      <canvas id="ecbOutputCanvas"></canvas>
+    </div>
+  </div>
+
+  <script type="module">
+    import { encrypt as aesEncryptCBC } from './aes-128_cbc.js';
+    import { encrypt as aesEncryptECB } from './aes-128_ecb.js';
+
+    function hexToBytes(hexStr) {
+      let hex = hexStr.trim().toLowerCase();
+      if (hex.startsWith('0x')) hex = hex.slice(2);
+      hex = hex.replace(/[^0-9a-f]/g, '');
+      if (hex.length !== 32) throw new Error('Key must be exactly 32 hex characters');
+      const bytes = new Uint8Array(16);
+      for (let i = 0; i < 16; i++) {
+        bytes[i] = parseInt(hex.slice(i*2, i*2+2), 16);
+      }
+      return bytes;
+    }
+
+    const keyInput       = document.getElementById('keyInput');
+    const fileInput      = document.getElementById('fileInput');
+    const cbcInCanvas    = document.getElementById('cbcInputCanvas');
+    const cbcOutCanvas   = document.getElementById('cbcOutputCanvas');
+    const ecbInCanvas    = document.getElementById('ecbInputCanvas');
+    const ecbOutCanvas   = document.getElementById('ecbOutputCanvas');
+    const cbcEncryptBtn  = document.getElementById('cbcEncryptBtn');
+    const ecbEncryptBtn  = document.getElementById('ecbEncryptBtn');
+    const cbcCtx         = cbcInCanvas.getContext('2d');
+    const cbcOutCtx      = cbcOutCanvas.getContext('2d');
+    const ecbCtx         = ecbInCanvas.getContext('2d');
+    const ecbOutCtx      = ecbOutCanvas.getContext('2d');
+
+    let img = new Image();
+    let imgW, imgH;
+    let keyBytes = null;
+    
+    function updateButtons() {
+      const ready = img.src && keyBytes;
+      cbcEncryptBtn.disabled = !ready;
+      ecbEncryptBtn.disabled = !ready;
+    }
+
+    keyInput.addEventListener('input', () => {
+      try {
+        keyBytes = hexToBytes(keyInput.value);
+      } catch {
+        keyBytes = null;
+      }
+      updateButtons();
+    });
+
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        imgW = img.naturalWidth;
+        imgH = img.naturalHeight;
+        [cbcInCanvas, cbcOutCanvas, ecbInCanvas, ecbOutCanvas].forEach(c => {
+          c.width = imgW;
+          c.height = imgH;
+        });
+        cbcCtx.drawImage(img, 0, 0);
+        ecbCtx.drawImage(img, 0, 0);
+        updateButtons();
+      };
+      img.src = url;
+    });
+
+    function process(canvasCtx, outCtx, encryptFn) {
+      const data = canvasCtx.getImageData(0, 0, imgW, imgH).data;
+      const bytes = new Uint8Array(data.buffer);
+      const encrypted = new Uint8Array(bytes.length);
+
+      for (let off=0; off<bytes.length; off+=16) {
+        const chunk = bytes.subarray(off, off+16);
+        const block = new Uint8Array(16);
+        block.set(chunk);
+        const enc = encryptFn(block, keyBytes);
+        encrypted.set(enc.subarray(0, chunk.length), off);
+      }
+
+      const clamped = new Uint8ClampedArray(encrypted.buffer);
+      const imgData = new ImageData(clamped, imgW, imgH);
+      outCtx.putImageData(imgData, 0, 0);
+    }
+
+    cbcEncryptBtn.addEventListener('click', () => {
+      process(cbcCtx, cbcOutCtx, aesEncryptCBC);
+    });
+    ecbEncryptBtn.addEventListener('click', () => {
+      process(ecbCtx, ecbOutCtx, aesEncryptECB);
+    });
+  </script>
+</body>
+</html>
